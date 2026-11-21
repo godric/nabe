@@ -3,6 +3,13 @@
 All notable changes to Nabe. Versions follow [Semantic Versioning](https://semver.org); each is published as
 `ghcr.io/godric/nabe:<version>`.
 
+## Unreleased
+
+### Added
+
+- When each address was last seen (5m, 4h, 3d), at the right of its line. The copy button now sits right after the
+  value it copies, and columns are a little wider so a full IPv6 address stays on one line.
+
 ## 0.1.1 - 2026-11-21
 
 ### Added

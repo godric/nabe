@@ -1,6 +1,8 @@
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const ago = t => { const s = Date.now()/1000 - t; return s < 90 ? "now" : s < 5400 ? Math.round(s/60)+" min ago"
   : s < 172800 ? Math.round(s/3600)+" h ago" : Math.round(s/86400)+" d ago"; };
+// The same, short, for the column after each address
+const agoShort = t => ago(t).replace(/ (min|h|d) ago$/, (_, u) => u[0]);
 const KIND = {global: "IPv6", ula: "ULA", "link-local": "link", ipv4: "IPv4"};
 // mDNS service types worth a tag, by what they mean; others show as their bare name
 const SERVICE_TAGS = {
@@ -17,7 +19,7 @@ const serviceTags = d => [...new Set(d.service_types.map(t => t.split("._")[0])
 // Six dots: the handle cards are dragged by, so the rest of the card stays selectable
 const GRIP = '<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">' +
   [3, 8, 13].flatMap(y => [3, 7].map(x => `<circle cx="${x}" cy="${y}" r="1.4"/>`)).join("") + "</svg>";
-// A small button after each MAC, address and name that copies it
+// A small button right after each MAC, address and name that copies it
 const COPY_ICON = '<svg viewBox="0.5 0.5 15 15" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" ' +
   'stroke-width="1.6"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"/><path d="M10.5 3.5v-.2A1.8 1.8 0 0 0 8.7 1.5H3.3A1.8 1.8 0 0 0 1.5 3.3v5.4a1.8 1.8 0 0 0 1.8 1.8h.2"/></svg>';
 const copyButton = text => `<span class="copy-col"><button type="button" class="copy" data-copy="${esc(text)}" title="Copy" ` +
@@ -48,11 +50,12 @@ function cardHtml(d) {
       serviceTags(d).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
     <ul>${d.addresses.map(a => `<li class="${Date.now()/1000 - a.last_seen > 600 ? "old" : ""}">
       <span class="${a.kind}">${KIND[a.kind]}</span>
-      <span class="addr value" title="${esc(a.state)}, seen ${ago(a.last_seen)}">${esc(a.address)}</span>${copyButton(a.address)}</li>`).join("")}
+      <span class="addr value" title="${esc(a.state)}">${esc(a.address)}</span>${copyButton(a.address)}
+      <span class="seen" title="Last seen ${esc(new Date(a.last_seen * 1000).toLocaleString())}">${agoShort(a.last_seen)}</span></li>`).join("")}
     ${[["mDNS", d.host && d.host + ".local"], ["NetBIOS", d.netbios], ["rDNS", d.rdns],
       // Names of the services it announces over mDNS
       ...d.services.map(n => ["Service", n])].filter(([, n]) => n)
-      .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}</li>`).join("")}</ul>
+      .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}<span class="seen"></span></li>`).join("")}</ul>
     <div class="card-end">&#8203;</div>
   </div>`;
 }

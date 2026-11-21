@@ -20,8 +20,8 @@ h1 { font-size:20px; margin:0; display:flex; align-items:center; gap:8px; } h1 i
 .theme button { border:0; background:none; color:var(--muted); font:inherit; font-size:13px; padding:4px 10px; cursor:pointer; }
 .theme button + button { border-left:1px solid var(--line); }
 .theme button[aria-pressed="true"] { background:var(--group); color:var(--fg); font-weight:600; }
-/* Masonry: groups flow into as many 440px columns as fit */
-main { columns:440px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
+/* Masonry: groups flow into as many 456px columns as fit: the narrowest that keeps a full IPv6 address on one line */
+main { columns:456px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
 /* inline-block, not just break-inside: a block's bottom margin can spill over the column break and push the next
    column's first group down */
 .group { display:inline-block; width:100%; box-sizing:border-box; vertical-align:top; break-inside:avoid;
@@ -60,17 +60,17 @@ main { columns:440px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
 .count { margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap; }
 .mac { font:12px ui-monospace,monospace; color:var(--muted); margin:2px 0 6px 17px; overflow-wrap:anywhere; }
 ul { list-style:none; margin:0; padding:0 0 0 17px; }
-li { display:flex; gap:8px; font:12px/1.7 ui-monospace,monospace; }
-li span:first-child { width:50px; flex:none; font-family:system-ui,sans-serif; font-size:11px; }
+li { display:flex; gap:6px; font:12px/1.7 ui-monospace,monospace; }
+li span:first-child { width:44px; flex:none; font-family:system-ui,sans-serif; font-size:11px; }
 /* The value is only as wide as its text, wrapping when it doesn't fit (long mDNS names, narrow screens): stretched,
-   a double-click in the blank after it would select on into the next card. The copy button keeps a column of its
-   own at the right edge, so it never gets pushed out of the card */
+   a double-click in the blank after it would select on into the next card. The copy button follows it */
 li .addr { flex:0 1 auto; min-width:0; overflow-wrap:anywhere; }
-/* The button's column fills the blank after the value and can't be selected, so a double-click there selects nothing
-   instead of running on into the next card */
-.copy-col { user-select:none; -webkit-user-select:none; }
-li .copy-col { flex:1; display:flex; justify-content:flex-end; align-self:stretch; align-items:flex-start; }
-li .copy { margin-top:1px; }
+.copy-col, .seen { user-select:none; -webkit-user-select:none; }
+li .copy-col { flex:none; display:flex; align-self:stretch; align-items:flex-start; }
+li .copy { margin:1px 0 0; }
+/* When each address was last seen, at the right edge; it fills the blank after the copy button and can't be selected,
+   so a double-click there selects nothing instead of running on into the next card */
+li .seen { flex:1 0 auto; text-align:right; white-space:nowrap; color:var(--muted); font:11px/1.9 system-ui,sans-serif; }
 .ipv4 { color:var(--v4); } .global { color:var(--gua); } .ula { color:var(--ula); } .link-local { color:var(--ll); }
 .old { opacity:.5; }
 /* An empty last line in each card: a triple-click selects a line with its line break, which on a card's last row
