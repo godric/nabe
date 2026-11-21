@@ -10,6 +10,10 @@ All notable changes to Nabe. Versions follow [Semantic Versioning](https://semve
 - When each address was last seen (5m, 4h, 3d), at the right of its line. The copy button now sits right after the
   value it copies, and columns are a little wider so a full IPv6 address stays on one line.
 
+### Fixed
+
+- Address labels (IPv4, IPv6, ...) sat slightly higher than the values next to them.
+
 ## 0.1.1 - 2026-11-21
 
 ### Added

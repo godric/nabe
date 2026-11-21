@@ -60,7 +60,8 @@ main { columns:456px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
 .count { margin-left:auto; font-size:12px; color:var(--muted); white-space:nowrap; }
 .mac { font:12px ui-monospace,monospace; color:var(--muted); margin:2px 0 6px 17px; overflow-wrap:anywhere; }
 ul { list-style:none; margin:0; padding:0 0 0 17px; }
-li { display:flex; gap:6px; font:12px/1.7 ui-monospace,monospace; }
+/* Labels, values and times are in different fonts and sizes: lined up on their baseline, not their tops */
+li { display:flex; align-items:baseline; gap:6px; font:12px/1.7 ui-monospace,monospace; }
 li span:first-child { width:44px; flex:none; font-family:system-ui,sans-serif; font-size:11px; }
 /* The value is only as wide as its text, wrapping when it doesn't fit (long mDNS names, narrow screens): stretched,
    a double-click in the blank after it would select on into the next card. The copy button follows it */
@@ -70,7 +71,7 @@ li .copy-col { flex:none; display:flex; align-self:stretch; align-items:flex-sta
 li .copy { margin:1px 0 0; }
 /* When each address was last seen, at the right edge; it fills the blank after the copy button and can't be selected,
    so a double-click there selects nothing instead of running on into the next card */
-li .seen { flex:1 0 auto; text-align:right; white-space:nowrap; color:var(--muted); font:11px/1.9 system-ui,sans-serif; }
+li .seen { flex:1 0 auto; text-align:right; white-space:nowrap; color:var(--muted); font-family:system-ui,sans-serif; font-size:11px; }
 .ipv4 { color:var(--v4); } .global { color:var(--gua); } .ula { color:var(--ula); } .link-local { color:var(--ll); }
 .old { opacity:.5; }
 /* An empty last line in each card: a triple-click selects a line with its line break, which on a card's last row
