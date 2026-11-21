@@ -14,6 +14,14 @@ const SERVICE_TAGS = {
 };
 const serviceTags = d => [...new Set(d.service_types.map(t => t.split("._")[0])
   .map(t => t in SERVICE_TAGS ? SERVICE_TAGS[t] : t.replace(/^_/, "")).filter(Boolean))].sort();
+// Six dots: the handle cards are dragged by, so the rest of the card stays selectable
+const GRIP = '<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">' +
+  [3, 8, 13].flatMap(y => [3, 7].map(x => `<circle cx="${x}" cy="${y}" r="1.4"/>`)).join("") + "</svg>";
+// A small button after each MAC, address and name that copies it
+const COPY_ICON = '<svg viewBox="0.5 0.5 15 15" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" ' +
+  'stroke-width="1.6"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"/><path d="M10.5 3.5v-.2A1.8 1.8 0 0 0 8.7 1.5H3.3A1.8 1.8 0 0 0 1.5 3.3v5.4a1.8 1.8 0 0 0 1.8 1.8h.2"/></svg>';
+const copyButton = text => `<span class="copy-col"><button type="button" class="copy" data-copy="${esc(text)}" title="Copy" ` +
+  `aria-label="Copy ${esc(text)}">${COPY_ICON}</button></span>`;
 const newId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 let devices = [], groups = [], probe = {}, probeInterval = 0, busy = false;
 
@@ -29,21 +37,23 @@ function allGroups() {
 }
 
 function cardHtml(d) {
-  return `<div class="card ${d.online ? "on" : ""}" draggable="true" data-mac="${esc(d.mac)}">
+  return `<div class="card ${d.online ? "on" : ""}" data-mac="${esc(d.mac)}">
     <div class="top"><span class="dot"></span><span class="name ${d.name ? "" : "unnamed"}">${esc(d.name || "Unknown")}</span>
       ${d.self ? '<span class="tag">this host</span>' : ""}${d.router ? '<span class="tag">router</span>' : ""}
-      ${d.random_mac ? '<span class="tag" title="Locally administered (private) MAC">private MAC</span>' : ""}</div>
-    <div class="mac">${esc(d.mac)} · ${d.online ? "online" : ago(d.last_seen)}</div>
+      ${d.random_mac ? '<span class="tag" title="Locally administered (private) MAC">private MAC</span>' : ""}
+      <span class="handle" draggable="true" title="Drag into another group">${GRIP}</span></div>
+    <div class="mac"><span class="value">${esc(d.mac)}</span>${copyButton(d.mac)} · ${d.online ? "online" : ago(d.last_seen)}</div>
     ${d.seen_via.length || d.service_types.length ? `<div class="tags">${
       d.seen_via.map(p => `<span class="tag proto" title="Answered over ${esc(p)}">${esc(p)}</span>`).join("")}${
       serviceTags(d).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
     <ul>${d.addresses.map(a => `<li class="${Date.now()/1000 - a.last_seen > 600 ? "old" : ""}">
       <span class="${a.kind}">${KIND[a.kind]}</span>
-      <span class="addr" title="${esc(a.state)}, seen ${ago(a.last_seen)}">${esc(a.address)}</span></li>`).join("")}
+      <span class="addr value" title="${esc(a.state)}, seen ${ago(a.last_seen)}">${esc(a.address)}</span>${copyButton(a.address)}</li>`).join("")}
     ${[["mDNS", d.host && d.host + ".local"], ["NetBIOS", d.netbios], ["rDNS", d.rdns],
       // Names of the services it announces over mDNS
       ...d.services.map(n => ["Service", n])].filter(([, n]) => n)
-      .map(([label, n]) => `<li><span>${label}</span><span class="addr">${esc(n)}</span></li>`).join("")}</ul>
+      .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}</li>`).join("")}</ul>
+    <div class="card-end">&#8203;</div>
   </div>`;
 }
 
@@ -126,12 +136,15 @@ let dragged = null;
 const clearDrop = () => document.querySelectorAll(".drop").forEach(el => el.classList.remove("drop"));
 const target = e => e.target.closest(".group") || e.target.closest("main");
 document.addEventListener("dragstart", e => {
-  const card = e.target.closest(".card");
+  const card = e.target.closest(".handle")?.closest(".card");
   if (!card || busy) return;
   dragged = card.dataset.mac;
   card.classList.add("dragging");
   e.dataTransfer.setData("text/plain", dragged);
   e.dataTransfer.effectAllowed = "move";
+  // Drag the whole card, held where the handle was grabbed
+  const box = card.getBoundingClientRect();
+  e.dataTransfer.setDragImage(card, e.clientX - box.left, e.clientY - box.top);
 });
 document.addEventListener("dragend", () => { dragged = null; clearDrop(); render(); });
 document.addEventListener("dragover", e => {
@@ -156,6 +169,29 @@ document.addEventListener("drop", async e => {
   if (into) into.members.push(mac);
   groups = groups.filter(g => g.members.length);
   await save();
+});
+
+// Copy buttons
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch (e) {}
+  // Pages served over plain HTTP have no clipboard API
+  const area = Object.assign(document.createElement("textarea"), {value: text});
+  document.body.append(area);
+  area.select();
+  const ok = document.execCommand("copy");
+  area.remove();
+  return ok;
+}
+document.addEventListener("click", async e => {
+  const el = e.target.closest(".copy");
+  if (!el || !await copyText(el.dataset.copy)) return;
+  // A small "Copied" bubble above the button
+  const box = el.getBoundingClientRect();
+  const toast = Object.assign(document.createElement("div"), {className: "toast", textContent: "Copied"});
+  toast.style.left = `${box.left + box.width / 2}px`;
+  toast.style.top = `${box.top}px`;
+  document.body.append(toast);
+  setTimeout(() => toast.remove(), 1000);
 });
 
 // Scan now, then refresh quickly until the round is over
