@@ -30,6 +30,7 @@ def test_serves_the_page_and_api(base_url):
     url, _ = base_url
 
     assert request(url + "/")[1].startswith("text/html")
+    assert request(url + "/?q=1")[1].startswith("text/html")
     assert request(url + "/app.js")[1].startswith("text/javascript")
     assert request(url + "/favicon.svg")[1] == "image/svg+xml"
     assert request(url + "/apple-touch-icon.png")[1] == "image/png"

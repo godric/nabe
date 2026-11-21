@@ -2,6 +2,7 @@ import json
 import logging
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from nabe import store
 
@@ -24,10 +25,11 @@ JSON = "application/json"
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/api/devices":
+        path = urlsplit(self.path).path  # without any ?query
+        if path == "/api/devices":
             self.reply(JSON, json.dumps(store.snapshot()).encode())
-        elif self.path in STATIC:
-            self.reply(*STATIC[self.path])
+        elif path in STATIC:
+            self.reply(*STATIC[path])
         else:
             self.send_error(404)
 
