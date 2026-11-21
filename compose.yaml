@@ -1,5 +1,7 @@
 services:
   nabe:
+    # Pulls the published image; `docker compose up -d --build` builds it from this checkout instead
+    image: ghcr.io/godric/nabe:latest
     build: .
     # Host network: it reads the host's neighbor table and probes the LAN from it
     network_mode: host

@@ -22,9 +22,13 @@ It needs Linux and the host's network (to read its neighbor table and probe the 
 `network_mode: host`:
 
 ```sh
-git clone https://github.com/godric/nabe.git && cd nabe
-IFACE=eth0 docker compose up -d --build
+curl -O https://raw.githubusercontent.com/godric/nabe/main/compose.yaml
+IFACE=eth0 docker compose up -d
 ```
+
+That pulls `ghcr.io/godric/nabe:latest` (amd64 and arm64), built from `main`; `docker compose pull && docker compose up
+-d` updates it. Releases are also tagged by version (`ghcr.io/godric/nabe:0.1.0`, `:0.1`). To build it yourself
+instead, clone the repo and run `IFACE=eth0 docker compose up -d --build`.
 
 It listens on `127.0.0.1:8097` by default, meant to sit behind a reverse proxy. Set `LISTEN_HOST=0.0.0.0` to reach
 it directly from the LAN. There is no authentication: anyone who can open the page can rename and regroup devices.
