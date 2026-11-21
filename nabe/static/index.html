@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nabe</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#14263f">
+<script>
+  // Applied before the page draws, so a chosen theme doesn't flash the system one first
+  try { const t = localStorage.getItem("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+<link rel="stylesheet" href="style.css"></head><body>
+<header><h1><img src="favicon.svg" alt="">Nabe</h1><span class="muted" id="summary"></span>
+<span class="muted" id="scan"></span><button id="scan-now" type="button">Scan now</button>
+<input id="filter" placeholder="Filter name, MAC or address" autocomplete="off">
+<div class="theme" role="group" aria-label="Theme"><button type="button" data-theme="auto">Auto</button><button type="button" data-theme="light">Light</button><button type="button" data-theme="dark">Dark</button></div></header>
+<main id="list"></main>
+<script src="app.js"></script></body></html>

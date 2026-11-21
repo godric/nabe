@@ -1,0 +1,13 @@
+services:
+  nabe:
+    build: .
+    # Host network: it reads the host's neighbor table and probes the LAN from it
+    network_mode: host
+    environment:
+      - IFACE=${IFACE:-eth0}
+      # Loopback by default: put a reverse proxy in front, or set 0.0.0.0 to open it to the LAN
+      - LISTEN_HOST=${LISTEN_HOST:-127.0.0.1}
+      - LISTEN_PORT=${LISTEN_PORT:-8097}
+    volumes:
+      - ./mount/data:/data
+    restart: unless-stopped

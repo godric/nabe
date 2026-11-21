@@ -1,0 +1,15 @@
+{
+  "name": "Nabe",
+  "short_name": "Nabe",
+  "description": "Who's on the LAN: every device by MAC, with its IPv4 and IPv6 addresses",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#14263f",
+  "theme_color": "#14263f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
