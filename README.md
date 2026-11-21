@@ -60,6 +60,12 @@ uv run pytest
 uv run ruff check . && uv run ruff format --check .
 ```
 
+## Releasing
+
+Every user-visible change goes in [CHANGELOG.md](CHANGELOG.md) under the next version. To release: set that version in
+`pyproject.toml` (and `uv lock`), date its changelog section, commit, then tag `v<version>` and push the tag. The
+image is published as `ghcr.io/godric/nabe:<version>` and `:<major>.<minor>`.
+
 ## Icons
 
 `nabe/static/icon.svg` (with MAC octets, for large sizes) and `favicon.svg` (without, for small ones) are the
