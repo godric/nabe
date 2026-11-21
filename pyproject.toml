@@ -3,10 +3,10 @@ name = "nabe"
 version = "0.1.0"
 description = "Devices on the LAN by MAC, with every IPv4 and IPv6 address seen for them"
 authors = [{ name = "godric" }]
-requires-python = ">=3.14,<4"
+requires-python = ">=3.15,<4"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 dependencies = []
 
@@ -25,7 +25,7 @@ testpaths = ["test"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py314"
+target-version = "py315"
 
 [tool.ruff.lint]
 select = ["ALL"]
