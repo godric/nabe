@@ -15,9 +15,9 @@ All notable changes to Nabe. Versions follow [Semantic Versioning](https://semve
 - Nothing seen is hidden or renamed any more: every mDNS, NetBIOS and reverse DNS name still kept (not only the
   latest), service names as announced (IDs included, and Google's friendly name next to its instance name), and the
   names containers announce on the host's own addresses.
-- mDNS service types are listed as announced on a "Types" line (`_airplay._tcp _sleep-proxy._udp`), instead of as
-  tags with friendly names (AirPlay, ...) that left some types out. Tags are only for how a device answered (mDNS,
-  NetBIOS, rDNS).
+- mDNS service types are listed as announced on a "Types" line, each in a box with its own copy button
+  (`_airplay._tcp`, `_sleep-proxy._udp`), instead of as tags with friendly names (AirPlay, ...) that left some types
+  out. Tags are only for how a device answered (mDNS, NetBIOS, rDNS).
 - Copy buttons are always shown, faint until hovered, instead of only when their line is hovered.
 
 ### Fixed

@@ -61,16 +61,21 @@ main { columns:456px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
 ul { list-style:none; margin:0; padding:0 0 0 17px; }
 /* Labels, values and times are in different fonts and sizes: lined up on their baseline, not their tops */
 li { display:flex; align-items:baseline; gap:6px; font:12px/1.7 ui-monospace,monospace; }
-li span:first-child { width:44px; flex:none; font-family:system-ui,sans-serif; font-size:11px; }
+li > span:first-child { width:44px; flex:none; font-family:system-ui,sans-serif; font-size:11px; }
 /* The value is only as wide as its text, wrapping when it doesn't fit (long mDNS names, narrow screens): stretched,
    a double-click in the blank after it would select on into the next card. The copy button follows it */
 li .addr { flex:0 1 auto; min-width:0; overflow-wrap:anywhere; }
 .copy-col, .seen { user-select:none; -webkit-user-select:none; }
-li .copy-col { flex:none; display:flex; align-self:stretch; align-items:flex-start; }
-li .copy { margin:1px 0 0; }
+li > .copy-col { flex:none; display:flex; align-self:stretch; align-items:flex-start; }
+li > .copy-col .copy { margin:1px 0 0; }
 /* When each address was last seen, at the right edge; it fills the blank after the copy button and can't be selected,
    so a double-click there selects nothing instead of running on into the next card */
 li .seen { flex:1 0 auto; text-align:right; white-space:nowrap; color:var(--muted); font-family:system-ui,sans-serif; font-size:11px; }
+/* Service types: boxes, with real spaces between them so a copied selection keeps them apart, each with its own copy
+   button */
+.type { display:inline-block; padding:0 1px 0 5px; margin:1px 0; border:1px solid var(--line); border-radius:5px;
+  line-height:1.45; }
+.type .copy { width:16px; height:16px; margin:-2px 0 0 1px; }
 .ipv4 { color:var(--v4); } .global { color:var(--gua); } .ula { color:var(--ula); } .link-local { color:var(--ll); }
 .old { opacity:.5; }
 /* An empty last line in each card: a triple-click selects a line with its line break, which on a card's last row

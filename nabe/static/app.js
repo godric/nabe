@@ -42,10 +42,11 @@ function cardHtml(d) {
     ${[...d.hosts.map(n => ["mDNS", n + ".local"]), ...d.netbios_names.map(n => ["NetBIOS", n]),
       ...d.rdns_names.map(n => ["rDNS", n]),
       // Names of the services it announces over mDNS
-      ...d.services.map(n => ["Service", n]),
-      // The types of the services it announces (_airplay._tcp, ...), as announced
-      ...d.service_types.length ? [["Types", d.service_types.join(" ")]] : []]
-      .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}<span class="seen"></span></li>`).join("")}</ul>
+      ...d.services.map(n => ["Service", n])]
+      .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}<span class="seen"></span></li>`).join("")}
+    ${d.service_types.length ? `<li><span>Types</span><span class="addr value">${
+      // The types of the services it announces, as announced, each in a box with its own copy button
+      d.service_types.map(t => `<span class="type">${esc(t)}${copyButton(t)}</span>`).join(" ")}</span><span class="seen"></span></li>` : ""}</ul>
     <div class="card-end">&#8203;</div>
   </div>`;
 }
