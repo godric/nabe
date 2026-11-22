@@ -3,7 +3,7 @@
 All notable changes to Nabe. Versions follow [Semantic Versioning](https://semver.org); each is published as
 `ghcr.io/godric/nabe:<version>`.
 
-## Unreleased
+## 0.1.3 - 2026-11-22
 
 ### Added
 
