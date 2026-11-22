@@ -32,7 +32,9 @@ function cardHtml(d) {
       ${d.self ? '<span class="tag">this host</span>' : ""}${d.router ? '<span class="tag">router</span>' : ""}
       ${d.random_mac ? '<span class="tag" title="Locally administered (private) MAC">private MAC</span>' : ""}
       <span class="handle" draggable="true" title="Drag into another group">${GRIP}</span></div>
-    <div class="mac"><span class="value">${esc(d.mac)}</span>${copyButton(d.mac)} · ${d.online ? "online" : ago(d.last_seen)}</div>
+    <div class="mac"><span class="value">${esc(d.mac)}</span>${copyButton(d.mac)}${
+      // The dot says whether it's online; when it isn't, since when
+      d.online ? "" : ` · ${ago(d.last_seen)}`}</div>
     ${d.seen_via.length ? `<div class="tags">${
       d.seen_via.map(p => `<span class="tag proto" title="Answered over ${esc(p)}">${esc(p)}</span>`).join("")}</div>` : ""}
     <ul>${d.addresses.map(a => `<li class="${Date.now()/1000 - a.last_seen > 600 ? "old" : ""}">

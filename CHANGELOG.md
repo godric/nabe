@@ -19,6 +19,8 @@ All notable changes to Nabe. Versions follow [Semantic Versioning](https://semve
   (`_airplay._tcp`, `_sleep-proxy._udp`), instead of as tags with friendly names (AirPlay, ...) that left some types
   out. Tags are only for how a device answered (mDNS, NetBIOS, rDNS).
 - Copy buttons are always shown, faint until hovered, instead of only when their line is hovered.
+- A device's MAC line no longer says "online", which the green dot already shows; offline ones still say when they
+  were last seen.
 
 ### Fixed
 
