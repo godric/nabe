@@ -73,6 +73,8 @@ def test_snapshot():
 
 def test_readable_host_prefers_a_service_over_an_opaque_id():
     assert store.readable_host("2ecc3cf8e3d44f2b947cdb5d678245f0", ["Home"]) == "Home"
+    services = ["Google-Home-Mini-2ecc3cf8e3d44f2b947cdb5d678245f0", "Kitchen", "fd37da3e-3444-5d9c-0f58-d50166360d4d"]
+    assert store.readable_host("2ecc3cf8e3d44f2b947cdb5d678245f0", services) == "Kitchen"
     assert store.readable_host("Apple-TV-4K", ["Apple TV 4K"]) == "Apple-TV-4K"
     assert store.readable_host(None, []) is None
 
@@ -96,7 +98,7 @@ def test_names_expire_like_addresses_and_the_latest_host_wins():
     )
 
     dev = store.snapshot(now=2010)["devices"][0]
-    assert (dev["host"], dev["services"]) == ("new", ["New", "Old"])
+    assert (dev["host"], dev["hosts"], dev["services"]) == ("new", ["new", "old"], ["New", "Old"])
 
     # The address keeps being confirmed, "old" and "Old" are past the retention period
     store.update(
@@ -105,6 +107,21 @@ def test_names_expire_like_addresses_and_the_latest_host_wins():
     )
     dev = store.snapshot()["devices"][0]
     assert (dev["host"], dev["services"], dev["seen_via"]) == ("new", ["New"], ["mDNS"])
+
+
+def test_the_host_goes_by_its_own_name_and_keeps_its_containers(monkeypatch):
+    monkeypatch.setattr(store.socket, "gethostname", lambda: "vin")
+    store.update([{"dst": "192.0.2.12", "lladdr": MAC, "state": ["SELF"]}], now=1000)
+    store.set_names(
+        {"192.0.2.12": {"host": "zigbee2mqtt.local.", "services": set(), "types": set()}},
+        {},
+        store.macs_by_address(),
+        MAC,
+        1000,
+    )
+
+    dev = store.snapshot(now=1010)["devices"][0]
+    assert (dev["name"], dev["hosts"]) == ("vin", ["zigbee2mqtt", "vin"])
 
 
 def test_load_reads_both_files():

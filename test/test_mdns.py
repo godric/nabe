@@ -73,5 +73,5 @@ def test_names_joins_hosts_and_services():
 
     assert found == {
         "192.0.2.12": {"host": "ipad.local.", "services": set(), "types": set()},
-        "192.0.2.20": {"host": "g.local.", "services": {"Kitchen"}, "types": {"_googlecast._tcp"}},
+        "192.0.2.20": {"host": "g.local.", "services": {"abc", "Kitchen"}, "types": {"_googlecast._tcp"}},
     }

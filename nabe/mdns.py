@@ -99,9 +99,14 @@ def ask(questions, wait=1.5):
     return records
 
 
+def unescape(label):
+    return label.replace("\\032", " ")
+
+
 def clean_label(label):
-    """A readable service name, or None for the opaque ones (UUIDs, hex IDs)."""
-    label = label.replace("\\032", " ").split("@", 1)[-1]  # AirPlay: "<MAC>@<name>"
+    """A service name without the IDs around it, or None for the opaque ones (UUIDs, hex IDs); only to pick a title,
+    names are kept as announced."""
+    label = unescape(label).split("@", 1)[-1]  # AirPlay: "<MAC>@<name>"
     label = re.sub(r"^\d+-\d+-\d+-\d+\.\d+ ", "", label)  # Apple companion link prefix
     return None if re.fullmatch(r"[0-9a-fA-F-]{12,}", label) else label
 
@@ -118,8 +123,8 @@ def ptr_address(name):
 
 
 def names(records):
-    """{address: {"host", "services", "types"}} from the records of a scan: the hostname, the readable names of the
-    services it announces and their types (_airplay._tcp, ...)."""
+    """{address: {"host", "services", "types"}} from the records of a scan: the hostname, the names of the services it
+    announces and their types (_airplay._tcp, ...)."""
     found = {}
     for name, rtype, value in records:
         if rtype in {A, AAAA}:
@@ -131,10 +136,10 @@ def names(records):
     for instance, target in ((n, v) for n, t, v in records if t == SRV):
         label, _, stype = instance.partition("._")
         types.setdefault(target, set()).add("_" + stype.removesuffix(".local."))
-        # Google devices put their friendly name in TXT fn=, others in the instance name
-        fn = next((s[3:] for s in txt.get(instance, []) if s.startswith("fn=")), None)
-        if label := clean_label(fn or label):
-            services.setdefault(target, set()).add(label)
+        services.setdefault(target, set()).add(unescape(label))
+        # Google devices put their friendly name in TXT fn=, their instance name is an ID
+        if fn := next((s[3:] for s in txt.get(instance, []) if s.startswith("fn=")), None):
+            services[target].add(fn)
     for info in found.values():
         info["services"] = services.get(info.get("host"), set())
         info["types"] = types.get(info.get("host"), set())

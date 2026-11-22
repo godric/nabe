@@ -82,8 +82,8 @@ def macs_by_address():
 
 
 def set_names(found, netbios, by_addr, self_mac, now=None):
-    """Record what the mDNS and NetBIOS scans found; the host keeps its own name, containers announce themselves on
-    its addresses."""
+    """Record what the mDNS and NetBIOS scans found, and the host's own name: containers announce theirs on its
+    addresses too."""
     now = now or time.time()
     with lock:
         for addr, info in found.items():
@@ -100,7 +100,6 @@ def set_names(found, netbios, by_addr, self_mac, now=None):
                 note(dev, "netbios", name, now)
                 note(dev, "via", "NetBIOS", now)
         if (dev := devices.get(self_mac)) is not None:
-            dev["names"] = {k: t for k, t in dev.get("names", {}).items() if not k.startswith("host:")}
             note(dev, "host", socket.gethostname(), now)
         write_json(config.STATE_FILE, devices)
 
@@ -141,9 +140,9 @@ def set_reverse_dns(by_addr, now=None):
 
 
 def readable_host(host, services):
-    """The mDNS hostname, or a service name when the hostname is an opaque ID (Google, Home Assistant)."""
+    """The mDNS hostname, or the shortest service name when the hostname is an opaque ID (Google, Home Assistant)."""
     if host and mdns.clean_label(host) is None:
-        return next(iter(services), host)
+        return min(filter(None, map(mdns.clean_label, services)), key=len, default=host)
     return host
 
 
@@ -159,7 +158,11 @@ def snapshot(now=None):
             key=lambda x: (ORDER[x["kind"]], ipaddress.ip_address(x["address"])),
         )
         last_seen = max(x["last_seen"] for x in addrs)
-        host, netbios, rdns = (next(iter(named(dev, k)), None) for k in ("host", "netbios", "rdns"))
+        is_self = any(x["state"] == "SELF" for x in addrs)
+        hosts, netbios_names, rdns_names = (named(dev, k) for k in ("host", "netbios", "rdns"))
+        # The latest of each names the device; the host goes by its own name, not its containers'
+        host = socket.gethostname() if is_self and hosts else next(iter(hosts), None)
+        netbios, rdns = (next(iter(n), None) for n in (netbios_names, rdns_names))
         services = sorted(named(dev, "service"))
         name = readable_host(host, services) or netbios or rdns
         result.append(
@@ -169,6 +172,10 @@ def snapshot(now=None):
                 "host": host,
                 "netbios": netbios,
                 "rdns": rdns,
+                # Every name still kept, most recent first
+                "hosts": hosts,
+                "netbios_names": netbios_names,
+                "rdns_names": rdns_names,
                 "services": services,
                 "service_types": sorted(named(dev, "type")),
                 # The ways it answered: mDNS, NetBIOS, reverse DNS
@@ -176,7 +183,7 @@ def snapshot(now=None):
                 # Locally administered bit: a randomized "private" MAC (phones, tablets, laptops)
                 "random_mac": bool(int(mac.split(":")[0], 16) & 2),
                 "router": dev["router"],
-                "self": any(x["state"] == "SELF" for x in addrs),
+                "self": is_self,
                 "last_seen": last_seen,
                 "online": now - last_seen < config.ONLINE_FOR,
                 "addresses": addrs,

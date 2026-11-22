@@ -9,7 +9,8 @@ page does, but including IPv6.
 - **Who's there:** it reads the host's neighbor table every 30 s, and every 5 min probes the LAN (an IPv6 all-nodes
   ping from each of the host's addresses, an IPv4 ping sweep) so quiet devices show up too.
 - **What they're called:** names come from mDNS (Bonjour), NetBIOS and reverse DNS. Each device shows which of them
-  it answered, and the services it announces over mDNS (AirPlay, Cast, HomeKit, SSH, printers, ...).
+  it answered, and the services it announces over mDNS, by name and type (`_airplay._tcp`, `_ssh._tcp`, ...). It's
+  a debugging page: everything is shown as it was seen, nothing is hidden or renamed.
 - **Groups:** every device sits in a group, alone by default. Drag devices together (a computer's Ethernet and Wi-Fi
   MACs, a phone's rotating private MACs) and rename the group.
 - **Memory:** addresses, names and services are kept until they haven't been seen for 7 days, so a device that's

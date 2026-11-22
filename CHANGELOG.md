@@ -10,6 +10,15 @@ All notable changes to Nabe. Versions follow [Semantic Versioning](https://semve
 - When each address was last seen (5m, 4h, 3d), at the right of its line. The copy button now sits right after the
   value it copies, and columns are a little wider so a full IPv6 address stays on one line.
 
+### Changed
+
+- Nothing seen is hidden or renamed any more: every mDNS, NetBIOS and reverse DNS name still kept (not only the
+  latest), service names as announced (IDs included, and Google's friendly name next to its instance name), and the
+  names containers announce on the host's own addresses.
+- mDNS service types are listed as announced on a "Types" line (`_airplay._tcp _sleep-proxy._udp`), instead of as
+  tags with friendly names (AirPlay, ...) that left some types out. Tags are only for how a device answered (mDNS,
+  NetBIOS, rDNS).
+
 ### Fixed
 
 - Address labels (IPv4, IPv6, ...) sat slightly higher than the values next to them.

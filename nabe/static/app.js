@@ -4,18 +4,6 @@ const ago = t => { const s = Date.now()/1000 - t; return s < 90 ? "now" : s < 54
 // The same, short, for the column after each address
 const agoShort = t => ago(t).replace(/ (min|h|d) ago$/, (_, u) => u[0]);
 const KIND = {global: "IPv6", ula: "ULA", "link-local": "link", ipv4: "IPv4"};
-// mDNS service types worth a tag, by what they mean; others show as their bare name
-const SERVICE_TAGS = {
-  _airplay: "AirPlay", _raop: "AirPlay", "_companion-link": "Apple", _googlecast: "Cast", _hap: "HomeKit",
-  _homekit: "HomeKit", _matter: "Matter", _matterc: "Matter", _meshcop: "Thread", _esphomelib: "ESPHome",
-  "_home-assistant": "Home Assistant", "_spotify-connect": "Spotify", _ssh: "SSH", "_sftp-ssh": "SSH", _smb: "SMB",
-  _afpovertcp: "AFP", _nfs: "NFS", _ipp: "Printer", _ipps: "Printer", _printer: "Printer",
-  "_pdl-datastream": "Printer", _scanner: "Scanner", _uscan: "Scanner", _http: "Web", _https: "Web",
-  _homeconnect: "Home Connect", "_fbx-api": "Freebox API", _esphomebuilder: "ESPHome builder", _asquic: "AirPlay",
-  _googlezone: null, _rdlink: null, "_sleep-proxy": null, "_device-info": null, _workstation: null,
-};
-const serviceTags = d => [...new Set(d.service_types.map(t => t.split("._")[0])
-  .map(t => t in SERVICE_TAGS ? SERVICE_TAGS[t] : t.replace(/^_/, "")).filter(Boolean))].sort();
 // Six dots: the handle cards are dragged by, so the rest of the card stays selectable
 const GRIP = '<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">' +
   [3, 8, 13].flatMap(y => [3, 7].map(x => `<circle cx="${x}" cy="${y}" r="1.4"/>`)).join("") + "</svg>";
@@ -45,16 +33,18 @@ function cardHtml(d) {
       ${d.random_mac ? '<span class="tag" title="Locally administered (private) MAC">private MAC</span>' : ""}
       <span class="handle" draggable="true" title="Drag into another group">${GRIP}</span></div>
     <div class="mac"><span class="value">${esc(d.mac)}</span>${copyButton(d.mac)} · ${d.online ? "online" : ago(d.last_seen)}</div>
-    ${d.seen_via.length || d.service_types.length ? `<div class="tags">${
-      d.seen_via.map(p => `<span class="tag proto" title="Answered over ${esc(p)}">${esc(p)}</span>`).join("")}${
-      serviceTags(d).map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
+    ${d.seen_via.length ? `<div class="tags">${
+      d.seen_via.map(p => `<span class="tag proto" title="Answered over ${esc(p)}">${esc(p)}</span>`).join("")}</div>` : ""}
     <ul>${d.addresses.map(a => `<li class="${Date.now()/1000 - a.last_seen > 600 ? "old" : ""}">
       <span class="${a.kind}">${KIND[a.kind]}</span>
       <span class="addr value" title="${esc(a.state)}">${esc(a.address)}</span>${copyButton(a.address)}
       <span class="seen" title="Last seen ${esc(new Date(a.last_seen * 1000).toLocaleString())}">${agoShort(a.last_seen)}</span></li>`).join("")}
-    ${[["mDNS", d.host && d.host + ".local"], ["NetBIOS", d.netbios], ["rDNS", d.rdns],
+    ${[...d.hosts.map(n => ["mDNS", n + ".local"]), ...d.netbios_names.map(n => ["NetBIOS", n]),
+      ...d.rdns_names.map(n => ["rDNS", n]),
       // Names of the services it announces over mDNS
-      ...d.services.map(n => ["Service", n])].filter(([, n]) => n)
+      ...d.services.map(n => ["Service", n]),
+      // The types of the services it announces (_airplay._tcp, ...), as announced
+      ...d.service_types.length ? [["Types", d.service_types.join(" ")]] : []]
       .map(([label, n]) => `<li><span>${label}</span><span class="addr value">${esc(n)}</span>${copyButton(n)}<span class="seen"></span></li>`).join("")}</ul>
     <div class="card-end">&#8203;</div>
   </div>`;
@@ -63,8 +53,8 @@ function cardHtml(d) {
 function render() {
   if (busy) return;
   const q = document.getElementById("filter").value.trim().toLowerCase();
-  const match = d => [d.name, d.host, d.netbios, d.rdns, d.mac, ...d.services, ...d.seen_via, ...serviceTags(d),
-    ...d.addresses.map(a => a.address)].join(" ").toLowerCase().includes(q);
+  const match = d => [d.name, ...d.hosts, ...d.netbios_names, ...d.rdns_names, d.mac, ...d.services, ...d.seen_via,
+    ...d.service_types, ...d.addresses.map(a => a.address)].join(" ").toLowerCase().includes(q);
   const shown = allGroups().filter(g => !q || g.title.toLowerCase().includes(q) || g.devs.some(match));
   document.getElementById("summary").textContent = `${devices.filter(d => d.online).length} online, ${devices.length} seen`;
   renderScan();
