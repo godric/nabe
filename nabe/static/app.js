@@ -69,8 +69,7 @@ function render() {
   document.getElementById("list").innerHTML = shown.map(g => `
     <section class="group ${g.devs.some(d => d.online) ? "on" : ""}" data-group="${esc(g.id)}">
       <div class="top"><span class="dot"></span>
-        <span class="name ${g.title ? "" : "unnamed"}" data-rename="${esc(g.id)}" title="Click to rename">${esc(g.title || "Unknown")}</span>
-        ${g.devs.length > 1 ? `<span class="count">${g.devs.filter(d => d.online).length}/${g.devs.length} online</span>` : ""}</div>
+        <span class="name ${g.title ? "" : "unnamed"}" data-rename="${esc(g.id)}" title="Click to rename">${esc(g.title || "Unknown")}</span></div>
       <div class="stack">${g.devs.map(cardHtml).join("")}</div>
     </section>`).join("");
 }

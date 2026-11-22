@@ -9,6 +9,11 @@ All notable changes to Nabe. Versions follow [Semantic Versioning](https://semve
 
 - A Wake button on offline devices, which sends them a Wake-on-LAN magic packet (`POST /api/wake`).
 
+### Changed
+
+- Groups no longer say how many of their devices are online ("1/2 online"): each device's dot shows it, and the
+  group's is green when any of them is.
+
 ## 0.1.2 - 2026-11-22
 
 ### Added
