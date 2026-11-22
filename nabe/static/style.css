@@ -35,12 +35,11 @@ main { columns:456px; column-gap:12px; padding:0 16px 16px; min-height:70vh; }
   border-radius:4px; }
 .card:hover .handle { opacity:1; } .handle:hover { background:var(--group); color:var(--fg); }
 .handle:active { cursor:grabbing; }
-/* Copy buttons: faint until their line is hovered; a "Copied" bubble rises above them */
+/* Copy buttons: always shown, faint until hovered; a "Copied" bubble rises above them */
 .copy { flex:none; box-sizing:border-box; width:18px; height:18px; padding:0; margin-left:2px; border:0; border-radius:4px;
   background:none; color:var(--muted); display:inline-flex; align-items:center; justify-content:center; line-height:0;
-  vertical-align:middle; align-self:center; opacity:0; }
+  vertical-align:middle; align-self:center; opacity:.6; }
 .copy svg { display:block; }
-.mac:hover .copy, li:hover .copy, .copy:focus-visible { opacity:.8; }
 .copy:hover { opacity:1; background:var(--group); color:var(--fg); }
 .toast { position:fixed; transform:translate(-50%, -100%); margin-top:-4px; padding:2px 8px; border-radius:6px;
   background:var(--fg); color:var(--bg); font:600 11px system-ui,sans-serif; pointer-events:none;
