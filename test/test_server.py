@@ -6,7 +6,7 @@ from urllib.error import HTTPError
 
 import pytest
 
-from nabe import server, store
+from nabe import server, store, system
 
 
 @pytest.fixture
@@ -58,3 +58,28 @@ def test_put_layout(base_url):
     assert saved == [{"groups": []}]
     with pytest.raises(HTTPError, match="400"):
         request(url + "/api/layout", "PUT", b"nope")
+
+
+def test_post_wake(base_url, monkeypatch):
+    url, _ = base_url
+    woken = []
+    monkeypatch.setattr(system, "wake", woken.append)
+
+    assert request(url + "/api/wake", "POST", b'{"mac": "aa:bb:cc:00:00:01"}')[0] == 200
+    assert woken == ["aa:bb:cc:00:00:01"]
+    with pytest.raises(HTTPError, match="400"):
+        request(url + "/api/wake", "POST", b"{}")
+
+
+def test_post_wake_rejects_what_isnt_a_mac_and_reports_failures(base_url, monkeypatch):
+    url, _ = base_url
+    # Checked before any socket is opened (raw ones only exist on Linux)
+    with pytest.raises(HTTPError, match="400"):
+        request(url + "/api/wake", "POST", b'{"mac": "nope"}')
+
+    def unsendable(_):
+        raise OSError
+
+    monkeypatch.setattr(system, "wake", unsendable)
+    with pytest.raises(HTTPError, match="500"):
+        request(url + "/api/wake", "POST", b'{"mac": "aa:bb:cc:00:00:01"}')

@@ -3,6 +3,12 @@
 All notable changes to Nabe. Versions follow [Semantic Versioning](https://semver.org); each is published as
 `ghcr.io/godric/nabe:<version>`.
 
+## Unreleased
+
+### Added
+
+- A Wake button on offline devices, which sends them a Wake-on-LAN magic packet (`POST /api/wake`).
+
 ## 0.1.2 - 2026-11-22
 
 ### Added

@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from nabe import store
+from nabe import store, system
 
 LOGGER = logging.getLogger(__name__)
 
@@ -34,10 +34,23 @@ class Handler(BaseHTTPRequestHandler):
             self.send_error(404)
 
     def do_POST(self):
-        if self.path != "/api/probe":
+        if self.path == "/api/probe":
+            store.probe_requested.set()
+        elif self.path == "/api/wake":
+            try:
+                mac = self.body()["mac"]
+                system.wake(mac)
+            except ValueError, KeyError, TypeError:
+                self.send_error(400)
+                return
+            except OSError:
+                LOGGER.exception("Couldn't send the magic packet")
+                self.send_error(500)
+                return
+            LOGGER.info("Sent a magic packet to %s", mac)
+        else:
             self.send_error(404)
             return
-        store.probe_requested.set()
         self.reply(JSON, b"{}")
 
     def do_PUT(self):
@@ -45,11 +58,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_error(404)
             return
         try:
-            store.save_layout(json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0)))))
+            store.save_layout(self.body())
         except ValueError, KeyError, TypeError, AttributeError:
             self.send_error(400)
             return
         self.reply(JSON, b"{}")
+
+    def body(self):
+        return json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))))
 
     def reply(self, ctype, body):
         self.send_response(200)

@@ -15,6 +15,9 @@ page does, but including IPv6.
   MACs, a phone's rotating private MACs) and rename the group.
 - **Memory:** addresses, names and services are kept until they haven't been seen for 7 days, so a device that's
   asleep or gone shows when it was last seen.
+- **Wake-on-LAN:** offline devices get a Wake button, which sends them a magic packet in a broadcast Ethernet frame
+  (as `ether-wake` does). Whether it wakes depends on the device: wired, with Wake-on-LAN enabled, and not using a
+  private MAC.
 - **No dependencies:** standard-library Python, one small page, a JSON file for state.
 
 ## Run it
@@ -44,17 +47,18 @@ it directly from the LAN. There is no authentication: anyone who can open the pa
 | `RETENTION_DAYS` | `7` | How long an address, name or service is kept after it was last seen |
 | `DATA_DIR` | `/data` | Where `devices.json` (what was seen) and `layout.json` (the groups) are kept |
 
-The container runs as root, as `ping` needs raw sockets.
+The container runs as root, as `ping` and Wake-on-LAN need raw sockets.
 
 ## How it works
 
 `main.py` runs the polling and probing threads and the web server. In `nabe/`:
 
-- `system.py`: the neighbor table and the host's addresses (iproute2), and the pings
+- `system.py`: the neighbor table and the host's addresses (iproute2), the pings and Wake-on-LAN
 - `mdns.py`: DNS packets, mDNS reverse lookups and service browsing
 - `nbns.py`: NetBIOS node status queries
 - `store.py`: what was seen, by MAC, the groups, and what the API returns
-- `server.py` and `static/`: the page (`/`), `GET /api/devices`, `PUT /api/layout` and `POST /api/probe`
+- `server.py` and `static/`: the page (`/`), `GET /api/devices`, `PUT /api/layout`, `POST /api/probe` and
+  `POST /api/wake` (`{"mac": ...}`)
 
 ```sh
 uv run pytest
