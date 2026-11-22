@@ -3,6 +3,13 @@
 All notable changes to Nabe. Versions follow [Semantic Versioning](https://semver.org); each is published as
 `ghcr.io/godric/nabe:<version>`.
 
+## Unreleased
+
+### Changed
+
+- The Wake button is an alarm clock (the power symbol read as an on/off switch) and is on every device, not only
+  offline ones: a device that was just shut down still shows online for a few minutes.
+
 ## 0.1.3 - 2026-11-22
 
 ### Added

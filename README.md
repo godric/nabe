@@ -15,9 +15,9 @@ page does, but including IPv6.
   MACs, a phone's rotating private MACs) and rename the group.
 - **Memory:** addresses, names and services are kept until they haven't been seen for 7 days, so a device that's
   asleep or gone shows when it was last seen.
-- **Wake-on-LAN:** offline devices get a Wake button, which sends them a magic packet in a broadcast Ethernet frame
-  (as `ether-wake` does). Whether it wakes depends on the device: wired, with Wake-on-LAN enabled, and not using a
-  private MAC.
+- **Wake-on-LAN:** every device gets a Wake button (a device that just shut down still shows online for a few
+  minutes), which sends it a magic packet in a broadcast Ethernet frame (as `ether-wake` does). Whether it wakes
+  depends on the device: wired, with Wake-on-LAN enabled, and not using a private MAC.
 - **No dependencies:** standard-library Python, one small page, a JSON file for state.
 
 ## Run it

@@ -8,9 +8,10 @@ const KIND = {global: "IPv6", ula: "ULA", "link-local": "link", ipv4: "IPv4"};
 const GRIP = '<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">' +
   [3, 8, 13].flatMap(y => [3, 7].map(x => `<circle cx="${x}" cy="${y}" r="1.4"/>`)).join("") + "</svg>";
 // A small button right after each MAC, address and name that copies it
-// Power symbol: the Wake button on offline cards
+// Alarm clock: the Wake button on every card (a power symbol reads as an on/off switch)
 const WAKE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" ' +
-  'stroke-width="1.6" stroke-linecap="round"><path d="M4.8 4a5.3 5.3 0 1 0 6.4 0"/><path d="M8 1.8v5.4"/></svg>';
+  'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8.8" r="5"/>' +
+  '<path d="M8 6.3v2.5l1.7 1.1M1.8 4.2l2.4-2.3M14.2 4.2l-2.4-2.3M4.6 13l-1.1 1.4M11.4 13l1.1 1.4"/></svg>';
 const COPY_ICON = '<svg viewBox="0.5 0.5 15 15" width="12" height="12" aria-hidden="true" fill="none" stroke="currentColor" ' +
   'stroke-width="1.6"><rect x="5.5" y="5.5" width="8" height="8" rx="1.8"/><path d="M10.5 3.5v-.2A1.8 1.8 0 0 0 8.7 1.5H3.3A1.8 1.8 0 0 0 1.5 3.3v5.4a1.8 1.8 0 0 0 1.8 1.8h.2"/></svg>';
 const copyButton = text => `<span class="copy-col"><button type="button" class="copy" data-copy="${esc(text)}" title="Copy" ` +
@@ -34,8 +35,8 @@ function cardHtml(d) {
     <div class="top"><span class="dot"></span><span class="name ${d.name ? "" : "unnamed"}">${esc(d.name || "Unknown")}</span>
       ${d.self ? '<span class="tag">this host</span>' : ""}${d.router ? '<span class="tag">router</span>' : ""}
       ${d.random_mac ? '<span class="tag" title="Locally administered (private) MAC">private MAC</span>' : ""}
-      ${d.online ? "" : `<button type="button" class="wake" data-wake="${esc(d.mac)}"
-        title="Wake: send a Wake-on-LAN magic packet to ${esc(d.mac)}" aria-label="Wake ${esc(d.mac)}">${WAKE_ICON}</button>`}
+      <button type="button" class="wake" data-wake="${esc(d.mac)}"
+        title="Wake: send a Wake-on-LAN magic packet to ${esc(d.mac)}" aria-label="Wake ${esc(d.mac)}">${WAKE_ICON}</button>
       <span class="handle" draggable="true" title="Drag into another group">${GRIP}</span></div>
     <div class="mac"><span class="value">${esc(d.mac)}</span>${copyButton(d.mac)}${
       // The dot says whether it's online; when it isn't, since when
@@ -196,7 +197,8 @@ document.addEventListener("click", async e => {
   if (el && await copyText(el.dataset.copy)) bubble(el, "Copied");
 });
 
-// Wake buttons, on offline cards: send the magic packet, nothing more; the card turns online if the device wakes
+// Wake buttons, on every card, as a device that just went down still shows online for a few minutes: send the magic
+// packet, nothing more; the card turns online if the device wakes
 document.addEventListener("click", async e => {
   const el = e.target.closest("[data-wake]");
   if (!el || el.disabled) return;
