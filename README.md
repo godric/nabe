@@ -1,10 +1,31 @@
-<p align="center"><img src="nabe/static/icon.svg" width="120" alt="Nabe"></p>
+<p align="center"><img src="nabe/static/icon.svg" width="120" alt=""></p>
 
-# Nabe
+<h1 align="center">Nabe</h1>
+
+<p align="center"><b>Who's on your LAN, every address they use, IPv6 included.</b></p>
+
+<p align="center">
+  <a href="https://github.com/godric/nabe/actions/workflows/docker.yml"><img src="https://github.com/godric/nabe/actions/workflows/docker.yml/badge.svg" alt="Build"></a>
+  <a href="https://github.com/godric/nabe/releases/latest"><img src="https://img.shields.io/github/v/release/godric/nabe" alt="Release"></a>
+  <a href="https://github.com/godric/nabe/pkgs/container/nabe"><img src="https://img.shields.io/badge/ghcr.io-godric%2Fnabe-blue?logo=docker&logoColor=white" alt="Image on GHCR"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/godric/nabe" alt="MIT license"></a>
+</p>
 
 Nabe (old New York slang for "neighborhood") is a small self-hosted page listing every device on your LAN by MAC
 address, with every IPv4, global IPv6, ULA and link-local address seen for it, the way a router's "connected devices"
-page does, but including IPv6.
+page does, but including IPv6. Add the names each device answers to over mDNS, NetBIOS and reverse DNS, the services
+it announces, and a Wake-on-LAN button, and it's the page to open when you wonder what that `fe80::` address is or
+whether the NAS is really asleep.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshot-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/screenshot-light.png">
+  <img src="docs/screenshot-light.png" alt="Nabe listing devices on a LAN, grouped, each with its MAC, addresses, names and services">
+</picture>
+
+<p align="center"><sub>A made-up LAN.</sub></p>
+
+## Features
 
 - **Who's there:** it reads the host's neighbor table every 30 s, and every 5 min probes the LAN (an IPv6 all-nodes
   ping from each of the host's addresses, an IPv4 ping sweep) so quiet devices show up too.
@@ -18,7 +39,8 @@ page does, but including IPv6.
 - **Wake-on-LAN:** every device gets a Wake button (a device that just shut down still shows online for a few
   minutes), which sends it a magic packet in a broadcast Ethernet frame (as `ether-wake` does). Whether it wakes
   depends on the device: wired, with Wake-on-LAN enabled, and not using a private MAC.
-- **No dependencies:** standard-library Python, one small page, a JSON file for state.
+- **No dependencies:** standard-library Python, one small page, a JSON file for state. A multi-arch image (amd64,
+  arm64), so it runs on a Raspberry Pi as well as on a NAS.
 
 ## Run it
 
